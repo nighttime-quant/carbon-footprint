@@ -6,3 +6,10 @@ Attention will be narrowed down to a restricted and economically active area of 
 this allows to capture features that are not only specific to the chosen area of attention, but to
 model systemic factors as well, thus allowing for these systemic features to be easily transferred
 to other parts of the continent that show different specific features.
+
+Main Data Sources are as follows:
+European Environment Agency:
+https://www.eea.europa.eu/en
+
+Eurostat:
+https://ec.europa.eu/eurostat
