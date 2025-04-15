@@ -10,6 +10,11 @@ from scipy.stats import pearsonr
 from scipy.stats import ks_2samp
 from sklearn.preprocessing import PowerTransformer
 
+### FUNCTIONS
+
+
+### CLASSES
+
 class DownloadSave():
     def __init__(self, url, path):
         self.url = url
@@ -28,3 +33,4 @@ class DownloadSave():
                     print(f"Error {e} occurred while downloading the file.")
             result = pd.read_excel(self.path, engine = "openpyxl")
             return result    
+
