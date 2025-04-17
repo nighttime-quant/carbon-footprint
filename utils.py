@@ -34,3 +34,18 @@ class DownloadSave():
             result = pd.read_excel(self.path, engine = "openpyxl")
             return result    
 
+class TreatSkewedVariables():
+    def __init__(self, df, threshold):
+        self.df = df
+        self.threshold = threshold
+    
+    def YeoJohnson(self):
+        numCols = self.df.select_dtypes(include = ['float']).columns.tolist()
+        transformer = PowerTransformer(method = 'yeo-johnson')
+        transformedCols = []
+        for numCol in numCols:
+            skewness = self.df[numCol].skew()
+            if skewness > self.threshold:
+                reshapedCol = self.df[numCol].values.reshape(-1, 1)
+                self.df[numCol + '_Unskew'] = transformer.fit_transform(reshapedCol)
+        return self.df
