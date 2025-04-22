@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as pyplot
+import plotly.graph_objects as go
+import plotly.express as px
 import requests
 import os
 import warnings
@@ -49,3 +51,10 @@ class TreatSkewedVariables():
                 reshapedCol = self.df[numCol].values.reshape(-1, 1)
                 self.df[numCol + '_Unskew'] = transformer.fit_transform(reshapedCol)
         return self.df
+
+class PlotSetup():
+    def __init__(self, title, xlab, ylab):
+        self.title = title
+        self.xlab = xlab
+        self.ylab = ylab
+    
