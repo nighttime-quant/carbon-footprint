@@ -8,12 +8,26 @@ import os
 import warnings
 import seaborn as sns
 import polars
-from scipy.stats import pearsonr
-from scipy.stats import ks_2samp
+from scipy import stats
 from sklearn.preprocessing import PowerTransformer
 
 ### FUNCTIONS
 
+def lineChartFunction(df, x, y, title: str, xlab, ylab, theme: str = 'plotly_white'):
+    fig = px.line(df, x = x, y = y, title = title, labels = {x: xlab, y: ylab}, template=theme)
+    return fig
+
+def barChartFunction(df, x, title: str, xlab: str, theme: str = 'plotly_white', y = None, ylab: str = None):
+    fig = px.bar(df, x = x, y = y, title = title, labels = {x: xlab, y: ylab}, template=theme)
+    return fig
+
+def scatterPlotFunction(df, x, y, title:str, xlab:str = None, ylab:str = None, theme: str = 'plotly_white'):
+    fig = px.scatter(data_frame=df, x=x, y=y, labels={x: xlab, y: ylab}, template=theme)
+    return fig
+
+def boxPlotFunction(df, y, x = None, title:str = None, ylab:str = None, xlab:str = None, theme:str = 'plotly_white'):
+    fig = px.box(df, y = y, x = x, title = title, labels = {x: xlab, y: ylab}, template = theme)
+    return fig
 
 ### CLASSES
 
@@ -51,22 +65,6 @@ class TreatSkewedVariables():
                 reshapedCol = self.df[numCol].values.reshape(-1, 1)
                 self.df[numCol + '_Unskew'] = transformer.fit_transform(reshapedCol)
         return self.df
-
-def lineChartFunction(df, x, y, title: str, xlab, ylab, theme: str = 'plotly_white'):
-    fig = px.line(df, x = x, y = y, title = title, labels = {x: xlab, y: ylab}, template=theme)
-    return fig
-
-def barChartFunction(df, x, title: str, xlab: str, theme: str = 'plotly_white', y = None, ylab: str = None):
-    fig = px.bar(df, x = x, y = y, title = title, labels = {x: xlab, y: ylab}, template=theme)
-    return fig
-
-def scatterPlotFunction(df, x, y, title:str, xlab:str = None, ylab:str = None, theme: str = 'plotly_white'):
-    fig = px.scatter(data_frame=df, x=x, y=y, labels={x: xlab, y: ylab}, template=theme)
-    return fig
-
-def boxPlotFunction(df, y, x = None, title:str = None, ylab:str = None, xlab:str = None, theme:str = 'plotly_white'):
-    fig = px.box(df, y = y, x = x, title = title, labels = {x: xlab, y: ylab}, template = theme)
-    return fig
 
 class PlotSetup():
     def __init__(
@@ -132,3 +130,42 @@ class DataVisualizer(PlotSetup):
 
     def show(self):
         self.fig.show()
+
+class DetectOutliers():
+    def __init__(self, df):
+        self.df = df
+        self.z_scores_array = np.array([])
+        self.IQR: float = 0.0
+        self.lowerQuartile:float = 0.0
+        self.upperQuartile:float = 0.0
+        self.lowerBound:float = 0.0
+        self.upperBound:float = 0.0
+
+    def z_score(self, column, threshold:int = 3, nan_handling = 'omit', **kwargs):
+        if column not in self.df.columns:
+            raise ValueError(f"Column '{column}' does not exist in the DataFrame.")
+        self.column = column
+        self.z_scores_array = stats.zscore(self.df[self.column], nan_policy=nan_handling, **kwargs)
+        self.df[self.column + '_z_score'] = self.z_scores_array
+        self.df[self.column + '_outlier'] = (self.df[self.column + '_z_score'].abs() > threshold).astype(int)
+        return self.df
+    
+    def iqr(self, column, quartileRange:tuple = (.25, .75), nan_handling = 'omit', interpolation = 'linear', factor:float = 1.5, **kwargs):
+        if column not in self.df.columns:
+            raise ValueError(f"Column '{column}' does not exist in the DataFrame.")
+        self.column = column
+        self.IQR = stats.iqr(self.df[self.column], rng=quartileRange, nan_policy=nan_handling, interpolation=interpolation, **kwargs)
+        self.lowerQuartile = self.df[self.column].quantile(quartileRange[0])
+        self.upperQuartile = self.df[self.column].quantile(quartileRange[1])
+        self.lowerBound = self.lowerQuartile - factor*self.IQR
+        self.upperBound = self.upperQuartile + factor*self.IQR
+        
+        conditions = [
+            self.df[self.column] < self.lowerBound,
+            self.df[self.column] > self.upperBound
+        ]
+        choices = [
+            1, 1
+        ]
+        self.df[self.column + '_outlier'] = np.select(conditions, choices, default=0)
+        return self.df
