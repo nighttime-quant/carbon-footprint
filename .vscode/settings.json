@@ -1,0 +1,11 @@
+{
+    "python.defaultInterpreterPath": "C:/Users/enric/Documents/carbon-footprint/.venv/Scripts/python.exe",
+    "python.pythonPath": "C:/Users/enric/Documents/carbon-footprint/.venv/Scripts/python.exe",
+    "github.copilot.enable": {
+      "*": false,
+      "plaintext": false,
+      "markdown": false,
+      "scminput": false
+    }
+  }
+  

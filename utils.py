@@ -52,9 +52,71 @@ class TreatSkewedVariables():
                 self.df[numCol + '_Unskew'] = transformer.fit_transform(reshapedCol)
         return self.df
 
+def lineChartFunction(df, x, y, title: str, xlab, ylab, theme: str = 'plotly_white'):
+    fig = px.line(df, x = x, y = y, title = title, labels = {x: xlab, y: ylab}, template=theme)
+    return fig
+
+def barChartFunction(df, x, title: str, xlab: str, theme: str = 'plotly_white', y = None, ylab: str = None):
+    fig = px.bar(df, x = x, y = y, title = title, labels = {x: xlab, y: ylab}, template=theme)
+    return fig
+
+def scatterPlotFunction(df, x, y, title:str, xlab:str = None, ylab:str = None, theme: str = 'plotly_white'):
+    fig = px.scatter(data_frame=df, x=x, y=y, labels={x: xlab, y: ylab}, template=theme)
+    return fig
+
 class PlotSetup():
-    def __init__(self, title, xlab, ylab):
-        self.title = title
-        self.xlab = xlab
-        self.ylab = ylab
+    def __init__(
+            self, 
+            df, 
+            width:int = 800,
+            height:int = 600,
+            theme: str = 'plotly_white'
+        ):
+        
+
+        self.df = df
+        self.theme = theme
+        self.width = width
+        self.height = height        
+
+        self.fig = go.Figure()
+
+        self.fig.update_layout(
+            template = theme,
+            width = width,
+            height = height
+        )
+
+class DataVisualizer(PlotSetup):
+    def __init__(self, df, width:int = 800, height:int = 600, theme:str = 'plotly_white'):
+        super().__init__(df = df, width = width, height = height, theme = theme)
     
+    def LineChart(self, xcol, ycol, title:str = None, xlab:str = None, ylab:str = None):
+        
+        self.xcol = xcol
+        self.ycol = ycol
+        self.title = title
+        self.xlab = xlab or xcol
+        self.ylab = ylab or ycol
+        self.fig = lineChartFunction(self.df, self.xcol, self.ycol, self.title, self.xlab, self.ylab, self.theme)
+        return self.fig
+    
+    def BarChart(self, xcol, title:str, xlab:str, ycol = None, ylab = None):
+        
+        self.xcol = xcol
+        self.title = title
+        self.xlab = xlab or xcol
+        self.ycol = ycol
+        self.ylab = ylab or ycol
+        self.fig = barChartFunction(self.df, self.xcol, self.title, self.xlab, self.theme, self.ycol, self.ylab)
+
+    def ScatterPlot(self, xcol, ycol, title:str = None, xlab:str = None, ylab:str = None):
+        self.xcol = xcol
+        self.ycol = ycol
+        self.title = title
+        self.xlab = xlab or xcol
+        self.ylab = ylab or ycol
+        self.fig = scatterPlotFunction(self.df, self.xcol, self.ycol, self.title, self.xlab, self.ylab, self.theme)
+
+    def show(self):
+        self.fig.show()
