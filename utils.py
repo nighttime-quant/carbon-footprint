@@ -64,6 +64,10 @@ def scatterPlotFunction(df, x, y, title:str, xlab:str = None, ylab:str = None, t
     fig = px.scatter(data_frame=df, x=x, y=y, labels={x: xlab, y: ylab}, template=theme)
     return fig
 
+def boxPlotFunction(df, y, x = None, title:str = None, ylab:str = None, xlab:str = None, theme:str = 'plotly_white'):
+    fig = px.box(df, y = y, x = x, title = title, labels = {x: xlab, y: ylab}, template = theme)
+    return fig
+
 class PlotSetup():
     def __init__(
             self, 
@@ -101,7 +105,7 @@ class DataVisualizer(PlotSetup):
         self.fig = lineChartFunction(self.df, self.xcol, self.ycol, self.title, self.xlab, self.ylab, self.theme)
         return self.fig
     
-    def BarChart(self, xcol, title:str, xlab:str, ycol = None, ylab = None):
+    def BarChart(self, xcol, title:str = None, xlab:str = None, ycol = None, ylab = None):
         
         self.xcol = xcol
         self.title = title
@@ -117,6 +121,14 @@ class DataVisualizer(PlotSetup):
         self.xlab = xlab or xcol
         self.ylab = ylab or ycol
         self.fig = scatterPlotFunction(self.df, self.xcol, self.ycol, self.title, self.xlab, self.ylab, self.theme)
+
+    def BoxPlot(self, ycol, xcol = None, ylab:str = None, xlab:str = None, title:str = None):
+        self.ycol = ycol
+        self.xcol = xcol
+        self.ylab = ylab or ycol
+        self.xlab = xlab or xcol
+        self.title = title
+        self.fig = boxPlotFunction(df=self.df, y=self.ycol, x=self.xcol, title=self.title, ylab=self.ylab, xlab=self.xlab, theme=self.theme)
 
     def show(self):
         self.fig.show()
