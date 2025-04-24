@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as pyplot
 import plotly.graph_objects as go
 import plotly.express as px
+from plotly.subplots import make_subplots
 import requests
 import os
 import warnings
@@ -13,21 +14,85 @@ from sklearn.preprocessing import PowerTransformer
 
 ### FUNCTIONS
 
-def lineChartFunction(df, x, y, title: str, xlab, ylab, theme: str = 'plotly_white'):
-    fig = px.line(df, x = x, y = y, title = title, labels = {x: xlab, y: ylab}, template=theme)
+def lineChartFunction(
+        fig, df, x, y, title: str, xlab, ylab, 
+        theme: str = 'plotly_white', mode:str = 'lines+markers',
+        **kwargs
+) -> go.Figure:
+    fig.add_trace(
+        go.Scatter(
+            x=df[x],
+            y=df[y],
+            mode=mode,
+            **kwargs
+        )
+    )
+    fig.update_layout(
+        title=title,
+        xaxis_title=xlab,
+        yaxis_title=ylab,
+        template=theme
+    )
     return fig
 
-def barChartFunction(df, x, title: str, xlab: str, theme: str = 'plotly_white', y = None, ylab: str = None):
-    fig = px.bar(df, x = x, y = y, title = title, labels = {x: xlab, y: ylab}, template=theme)
+def barChartFunction(
+        fig, df, x, title:str = None, xlab:str = None, 
+        theme:str = 'plotly_white', y = None, ylab:str = None,
+        **kwargs
+) -> go.Figure:
+    fig.add_trace(
+        go.Bar(
+            x=df[x],
+            y=df[y],
+            **kwargs
+        )
+    )
+    fig.update_layout(
+        title=title,
+        xaxis_title=xlab,
+        yaxis_title=ylab,
+        template=theme
+    )
     return fig
 
-def scatterPlotFunction(df, x, y, title:str, xlab:str = None, ylab:str = None, theme: str = 'plotly_white'):
-    fig = px.scatter(data_frame=df, x=x, y=y, labels={x: xlab, y: ylab}, template=theme)
+def scatterPlotFunction(
+        fig, df, x, y, title:str = None, xlab:str = None,
+        ylab:str = None, theme:str = 'plotly_white',
+        mode:str = 'markers', **kwargs
+) -> go.Figure:
+    fig.add_trace(
+        go.Scatter(
+            x=df[x],
+            y=df[y],
+            mode=mode,
+            **kwargs
+        )
+    )
+    fig.update_layout(
+        title=title,
+        xaxis_title=xlab,
+        yaxis_title=ylab,
+        template=theme
+    )
     return fig
 
-def boxPlotFunction(df, y, x = None, title:str = None, ylab:str = None, xlab:str = None, theme:str = 'plotly_white'):
-    fig = px.box(df, y = y, x = x, title = title, labels = {x: xlab, y: ylab}, template = theme)
-    return fig
+def boxPlotFunction(
+        fig, df, y, x = None, title:str = None, ylab:str = None,
+        xlab:str = None, theme:str = 'plotly_white', **kwargs
+) -> go.Figure:
+    fig.add_trace(
+        go.Box(
+            y=df[y],
+            x=df[x],
+            **kwargs
+        )
+    )
+    fig.update_layout(
+        title=title,
+        xaxis_title=xlab,
+        yaxis_title=ylab,
+        theme=theme
+    )
 
 ### CLASSES
 
@@ -100,7 +165,7 @@ class DataVisualizer(PlotSetup):
         self.title = title
         self.xlab = xlab or xcol
         self.ylab = ylab or ycol
-        self.fig = lineChartFunction(self.df, self.xcol, self.ycol, self.title, self.xlab, self.ylab, self.theme)
+        lineChartFunction(self.fig, self.df, self.xcol, self.ycol, self.title, self.xlab, self.ylab, self.theme)
         return self.fig
     
     def BarChart(self, xcol, title:str = None, xlab:str = None, ycol = None, ylab = None):
@@ -110,7 +175,8 @@ class DataVisualizer(PlotSetup):
         self.xlab = xlab or xcol
         self.ycol = ycol
         self.ylab = ylab or ycol
-        self.fig = barChartFunction(self.df, self.xcol, self.title, self.xlab, self.theme, self.ycol, self.ylab)
+        barChartFunction(self.fig, self.df, self.xcol, self.title, self.xlab, self.theme, self.ycol, self.ylab)
+        return self.fig
 
     def ScatterPlot(self, xcol, ycol, title:str = None, xlab:str = None, ylab:str = None):
         self.xcol = xcol
@@ -118,7 +184,8 @@ class DataVisualizer(PlotSetup):
         self.title = title
         self.xlab = xlab or xcol
         self.ylab = ylab or ycol
-        self.fig = scatterPlotFunction(self.df, self.xcol, self.ycol, self.title, self.xlab, self.ylab, self.theme)
+        scatterPlotFunction(self.fig, self.df, self.xcol, self.ycol, self.title, self.xlab, self.ylab, self.theme)
+        return self.fig
 
     def BoxPlot(self, ycol, xcol = None, ylab:str = None, xlab:str = None, title:str = None):
         self.ycol = ycol
@@ -126,8 +193,9 @@ class DataVisualizer(PlotSetup):
         self.ylab = ylab or ycol
         self.xlab = xlab or xcol
         self.title = title
-        self.fig = boxPlotFunction(df=self.df, y=self.ycol, x=self.xcol, title=self.title, ylab=self.ylab, xlab=self.xlab, theme=self.theme)
-
+        boxPlotFunction(self.fig, df=self.df, y=self.ycol, x=self.xcol, title=self.title, ylab=self.ylab, xlab=self.xlab, theme=self.theme)
+        return self.fig
+    
     def show(self):
         self.fig.show()
 
