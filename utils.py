@@ -35,6 +35,28 @@ def lineChartFunction(
     )
     return fig
 
+def lineChartSubPlots(
+        fig, df, x, y, title:str, xlab:str, ylab:str,
+        theme:str = 'plotly_white', mode:str = 'lines+markers',
+        r:int = 1, c:int = 1, **kwargs
+) -> go.Figure:
+    fig.add_trace(
+        go.Scatter(
+            x=df[x],
+            y=df[y],
+            mode=mode,
+            **kwargs
+        ),
+        row = r, col = c
+    )
+    fig.update_layout(
+        title=title,
+        xaxis_title=xlab,
+        yaxis_title=ylab,
+        template=theme
+    )
+    return fig
+
 def barChartFunction(
         fig, df, x, title:str = None, xlab:str = None, 
         theme:str = 'plotly_white', y = None, ylab:str = None,
@@ -46,6 +68,27 @@ def barChartFunction(
             y=df[y],
             **kwargs
         )
+    )
+    fig.update_layout(
+        title=title,
+        xaxis_title=xlab,
+        yaxis_title=ylab,
+        template=theme
+    )
+    return fig
+
+def barChartSubPlots(
+        fig, df, x, title:str = None, xlab:str = None, 
+        theme:str = 'plotly_white', y = None, ylab:str = None,
+        r:int = 1, c:int =1, **kwargs
+) -> go.Figure:
+    fig.add_trace(
+        go.Bar(
+            x=df[x],
+            y=df[y],
+            **kwargs
+        ),
+        row = r, col = c
     )
     fig.update_layout(
         title=title,
@@ -76,6 +119,28 @@ def scatterPlotFunction(
     )
     return fig
 
+def scatterPlotSubPlots(
+        fig, df, x, y, title:str = None, xlab:str = None,
+        ylab:str = None, theme:str = 'plotly_white',
+        mode:str = 'markers', r:int = 1, c:int = 1, **kwargs
+) -> go.Figure:
+    fig.add_trace(
+        go.Scatter(
+            x=df[x],
+            y=df[y],
+            mode=mode,
+            **kwargs
+        ),
+        row = r, col = c
+    )
+    fig.update_layout(
+        title=title,
+        xaxis_title=xlab,
+        yaxis_title=ylab,
+        template=theme
+    )
+    return fig
+
 def boxPlotFunction(
         fig, df, y, x = None, title:str = None, ylab:str = None,
         xlab:str = None, theme:str = 'plotly_white', **kwargs
@@ -93,6 +158,28 @@ def boxPlotFunction(
         yaxis_title=ylab,
         theme=theme
     )
+    return fig
+
+def boxPlotSubPlots(
+        fig, df, y, x = None, title:str = None, ylab:str = None,
+        xlab:str = None, theme:str = 'plotly_white',
+        r:int = 1, c:int = 1, **kwargs
+) -> go.Figure:
+    fig.add_trace(
+        go.Box(
+            y=df[y],
+            x=df[x],
+            **kwargs
+        ),
+        row = r, col = c
+    )
+    fig.update_layout(
+        title=title,
+        xaxis_title=xlab,
+        yaxis_title=ylab,
+        theme=theme
+    )
+    return fig
 
 ### CLASSES
 
@@ -144,7 +231,7 @@ class PlotSetup():
         self.df = df
         self.theme = theme
         self.width = width
-        self.height = height        
+        self.height = height
 
         self.fig = go.Figure()
 
@@ -165,7 +252,10 @@ class DataVisualizer(PlotSetup):
         self.title = title
         self.xlab = xlab or xcol
         self.ylab = ylab or ycol
-        lineChartFunction(self.fig, self.df, self.xcol, self.ycol, self.title, self.xlab, self.ylab, self.theme)
+        lineChartFunction(
+            fig=self.fig, df=self.df, x=self.xcol, y=self.ycol, title=self.title, 
+            xlab=self.xlab, ylab=self.ylab, theme=self.theme
+        )
         return self.fig
     
     def BarChart(self, xcol, title:str = None, xlab:str = None, ycol = None, ylab = None):
@@ -175,7 +265,10 @@ class DataVisualizer(PlotSetup):
         self.xlab = xlab or xcol
         self.ycol = ycol
         self.ylab = ylab or ycol
-        barChartFunction(self.fig, self.df, self.xcol, self.title, self.xlab, self.theme, self.ycol, self.ylab)
+        barChartFunction(
+            fig=self.fig, df=self.df, x=self.xcol, title=self.title, 
+            xlab=self.xlab, theme=self.theme, y=self.ycol, ylab=self.ylab
+        )
         return self.fig
 
     def ScatterPlot(self, xcol, ycol, title:str = None, xlab:str = None, ylab:str = None):
@@ -184,7 +277,10 @@ class DataVisualizer(PlotSetup):
         self.title = title
         self.xlab = xlab or xcol
         self.ylab = ylab or ycol
-        scatterPlotFunction(self.fig, self.df, self.xcol, self.ycol, self.title, self.xlab, self.ylab, self.theme)
+        scatterPlotFunction(
+            fig=self.fig, df=self.df, x=self.xcol, y=self.ycol, 
+            title=self.title, xlab=self.xlab, ylab=self.ylab, theme=self.theme
+        )
         return self.fig
 
     def BoxPlot(self, ycol, xcol = None, ylab:str = None, xlab:str = None, title:str = None):
@@ -193,7 +289,155 @@ class DataVisualizer(PlotSetup):
         self.ylab = ylab or ycol
         self.xlab = xlab or xcol
         self.title = title
-        boxPlotFunction(self.fig, df=self.df, y=self.ycol, x=self.xcol, title=self.title, ylab=self.ylab, xlab=self.xlab, theme=self.theme)
+        boxPlotFunction(
+            fig=self.fig, df=self.df, y=self.ycol, x=self.xcol, title=self.title, 
+            ylab=self.ylab, xlab=self.xlab, theme=self.theme
+        )
+        return self.fig
+    
+    def show(self):
+        self.fig.show()        
+
+class SubPlots():
+    
+    def __init__(
+            self, 
+            df, 
+            width:int = 800, 
+            height:int = 600, 
+            theme:str = 'plotly_white'
+    ):
+        self.df = df
+        self.width = width
+        self.height = height
+        self.theme = theme
+    
+    def LineChartSubPlots(self, xcol, ycol, rows:int = 1, cols:int = 2, title:str = None, xlab = None, ylab = None):
+        self.xcol = xcol
+        self.ycol = ycol
+        self.title = title
+        self.xlab = xlab or xcol
+        self.ylab = ylab or ycol
+        self.rows = rows
+        self.cols = cols
+
+        self.fig = make_subplots(rows=rows, cols=cols)
+        self.fig.update_layout(
+            template = self.theme,
+            width = self.width,
+            height = self.height
+        )
+
+        if isinstance(self.xcol, str):
+            self.xcol = (self.xcol,) * len(self.ycol)
+            self.xlab = (self.xlab,) * len(self.ylab)
+        
+        if isinstance(self.ycol, str):
+            self.ycol = (self.ycol,) * len(self.xcol)
+            self.ylab = (self.ylab,) * len(self.xlab)
+        
+        for r in range(self.rows):
+            for c in range(self.cols):
+                lineChartSubPlots(
+                    fig=self.fig, df=self.df, x=self.xcol[r], y=self.ycol[c], title=self.title, xlab=self.xlab[r], 
+                    ylab=self.ylab[c], r=r + 1, c=c + 1
+                )
+        return self.fig
+    
+    def BarChartSubPlots(self, xcol, ycol = None, rows:int = 1, cols:int = 2, title:str = None, xlab = None, ylab = None):
+        self.xcol = xcol
+        self.ycol = ycol
+        self.title = title
+        self.xlab = xlab or xcol
+        self.ylab = ylab or ycol
+        self.rows = rows
+        self.cols = cols
+
+        self.fig = make_subplots(rows=rows, cols=cols)
+        self.fig.update_layout(
+            template = self.theme,
+            width = self.width,
+            height = self.height
+        )
+
+        if isinstance(self.xcol, str):
+            self.xcol = (self.xcol,) * len(self.ycol)
+            self.xlab = (self.xlab,) * len(self.ylab)
+        
+        if isinstance(self.ycol, str):
+            self.ycol = (self.ycol,) * len(self.xcol)
+            self.ylab = (self.ylab,) * len(self.xlab)
+        
+        for r in range(self.rows):
+            for c in range(self.cols):
+                barChartSubPlots(
+                    fig=self.fig, df=self.df, x=self.xcol[r], y=self.ycol[c], title=self.title, xlab=self.xlab[r], 
+                    ylab=self.ylab[c], r=r + 1, c=c + 1
+                )
+        return self.fig
+
+    def ScatterSubPlots(self, xcol, ycol = None, rows:int = 1, cols:int = 2, title:str = None, xlab = None, ylab = None):
+        self.xcol = xcol
+        self.ycol = ycol
+        self.title = title
+        self.xlab = xlab or xcol
+        self.ylab = ylab or ycol
+        self.rows = rows
+        self.cols = cols
+
+        self.fig = make_subplots(rows=rows, cols=cols)
+        self.fig.update_layout(
+            template = self.theme,
+            width = self.width,
+            height = self.height
+        )
+
+        if isinstance(self.xcol, str):
+            self.xcol = (self.xcol,) * len(self.ycol)
+            self.xlab = (self.xlab,) * len(self.ylab)
+        
+        if isinstance(self.ycol, str):
+            self.ycol = (self.ycol,) * len(self.xcol)
+            self.ylab = (self.ylab,) * len(self.xlab)
+        
+        for r in range(self.rows):
+            for c in range(self.cols):
+                scatterPlotSubPlots(
+                    fig=self.fig, df=self.df, x=self.xcol[r], y=self.ycol[c], title=self.title, xlab=self.xlab[r], 
+                    ylab=self.ylab[c], r=r + 1, c=c + 1
+                )
+        return self.fig
+
+    def BoxSubPlots(self, xcol, ycol = None, rows:int = 1, cols:int = 2, title:str = None, xlab = None, ylab = None):
+        self.xcol = xcol
+        self.ycol = ycol
+        self.title = title
+        self.xlab = xlab or xcol
+        self.ylab = ylab or ycol
+        self.rows = rows
+        self.cols = cols
+
+        self.fig = make_subplots(rows=rows, cols=cols)
+        self.fig.update_layout(
+            template = self.theme,
+            width = self.width,
+            height = self.height
+        )
+
+        if isinstance(self.xcol, str):
+            self.xcol = (self.xcol,) * len(self.ycol)
+            self.xlab = (self.xlab,) * len(self.ylab)
+        
+        if isinstance(self.ycol, str):
+            self.ycol = (self.ycol,) * len(self.xcol)
+            self.ylab = (self.ylab,) * len(self.xlab)
+        
+        for r in range(self.rows):
+            for c in range(self.cols):
+                boxPlotSubPlots(
+                    fig=self.fig, df=self.df, x=self.xcol[r], y=self.ycol[c], title=self.title, xlab=self.xlab[r], 
+                    ylab=self.ylab[c], r=r + 1, c=c + 1
+                )
         return self.fig
     
     def show(self):
