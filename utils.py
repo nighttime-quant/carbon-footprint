@@ -80,10 +80,11 @@ def barChartFunction(
 def barChartSubPlots(
         fig, df, x, title:str = None, xlab:str = None, 
         theme:str = 'plotly_white', y = None, ylab:str = None,
-        r:int = 1, c:int =1, **kwargs
+        r:int = 1, c:int = 1, name:str = None, **kwargs
 ) -> go.Figure:
     fig.add_trace(
         go.Bar(
+            name = name,
             x=df[x],
             y=df[y],
             **kwargs
@@ -338,6 +339,8 @@ class SubPlots():
         
         for r in range(self.rows):
             for c in range(self.cols):
+                self.name = 'X: ' + self.xlab[r] + ' - Y: ' + self.ylab[c] or 'X: ' + self.xcol[r] + ' - Y: ' + self.ycol[c]
+                
                 lineChartSubPlots(
                     fig=self.fig, df=self.df, x=self.xcol[r], y=self.ycol[c], title=self.title, xlab=self.xlab[r], 
                     ylab=self.ylab[c], r=r + 1, c=c + 1
@@ -352,6 +355,7 @@ class SubPlots():
         self.ylab = ylab or ycol
         self.rows = rows
         self.cols = cols
+
 
         self.fig = make_subplots(rows=rows, cols=cols)
         self.fig.update_layout(
@@ -370,9 +374,10 @@ class SubPlots():
         
         for r in range(self.rows):
             for c in range(self.cols):
+                self.name = 'X: ' + self.xlab[r] + ' - Y: ' + self.ylab[c] or 'X: ' + self.xcol[r] + ' - Y: ' + self.ycol[c]
                 barChartSubPlots(
                     fig=self.fig, df=self.df, x=self.xcol[r], y=self.ycol[c], title=self.title, xlab=self.xlab[r], 
-                    ylab=self.ylab[c], r=r + 1, c=c + 1
+                    ylab=self.ylab[c], r=r + 1, c=c + 1, name = self.name
                 )
         return self.fig
 
@@ -402,6 +407,8 @@ class SubPlots():
         
         for r in range(self.rows):
             for c in range(self.cols):
+                self.name = 'X: ' + self.xlab[r] + ' - Y: ' + self.ylab[c] or 'X: ' + self.xcol[r] + ' - Y: ' + self.ycol[c]
+                
                 scatterPlotSubPlots(
                     fig=self.fig, df=self.df, x=self.xcol[r], y=self.ycol[c], title=self.title, xlab=self.xlab[r], 
                     ylab=self.ylab[c], r=r + 1, c=c + 1
@@ -434,6 +441,8 @@ class SubPlots():
         
         for r in range(self.rows):
             for c in range(self.cols):
+                self.name = 'X: ' + self.xlab[r] + ' - Y: ' + self.ylab[c] or 'X: ' + self.xcol[r] + ' - Y: ' + self.ycol[c]
+                
                 boxPlotSubPlots(
                     fig=self.fig, df=self.df, x=self.xcol[r], y=self.ycol[c], title=self.title, xlab=self.xlab[r], 
                     ylab=self.ylab[c], r=r + 1, c=c + 1
